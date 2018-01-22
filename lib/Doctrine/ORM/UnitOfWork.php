@@ -851,13 +851,32 @@ class UnitOfWork implements PropertyChangedListener
         $generationPlan->executeImmediate($this->em, $entity);
 
         if (! $generationPlan->containsDeferred()) {
-            $id                            = $this->em->getIdentifierFlattener()->flattenIdentifier($class, $persister->getIdentifier($entity));
-            $this->entityIdentifiers[$oid] = $id;
+            $id = $this->em->getIdentifierFlattener()->flattenIdentifier($class, $persister->getIdentifier($entity));
+
+            // Some identifiers may be foreign keys to new entities.
+            // In this case, we don't have the value yet and should treat it as if we have a post-insert generator
+            if (! $this->hasMissingIdsWhichAreForeignKeys($class, $id)) {
+                $this->entityIdentifiers[$oid] = $id;
+            }
         }
 
         $this->entityStates[$oid] = self::STATE_MANAGED;
 
         $this->scheduleForInsert($entity);
+    }
+
+    /**
+     * @param mixed[] $idValue
+     */
+    private function hasMissingIdsWhichAreForeignKeys(ClassMetadata $class, array $idValue) : bool
+    {
+        foreach ($idValue as $idField => $idFieldValue) {
+            if ($idFieldValue === null && isset($class->associationMappings[$idField])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -953,6 +972,8 @@ class UnitOfWork implements PropertyChangedListener
         $invoke         = $this->listenersInvoker->getSubscribedSystems($class, Events::postPersist);
         $generationPlan = $class->getValueGenerationPlan();
 
+        $insertionsForClass = [];
+
         foreach ($this->entityInsertions as $oid => $entity) {
             if ($this->em->getClassMetadata(get_class($entity))->getClassName() !== $className) {
                 continue;
@@ -980,6 +1001,30 @@ class UnitOfWork implements PropertyChangedListener
                 $this->listenersInvoker->invoke($class, Events::postPersist, $entity, $eventArgs, $invoke);
             }
         }
+    }
+
+    /**
+     * @param object $entity
+     */
+    private function addToEntityIdentifiersAndEntityMap(ClassMetadata $class, string $oid, $entity): void
+    {
+        $identifier = [];
+
+        foreach ($class->getIdentifierFieldNames() as $idField) {
+            $value = $class->getFieldValue($entity, $idField);
+
+            if (isset($class->associationMappings[$idField])) {
+                // NOTE: Single Columns as associated identifiers only allowed - this constraint it is enforced.
+                $value = $this->getSingleIdentifierValue($value);
+            }
+
+            $identifier[$idField] = $this->originalEntityData[$oid][$idField] = $value;
+        }
+
+        $this->entityStates[$oid]      = self::STATE_MANAGED;
+        $this->entityIdentifiers[$oid] = $identifier;
+
+        $this->addToIdentityMap($entity);
     }
 
     /**
