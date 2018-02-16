@@ -35,7 +35,7 @@ final class GH7067Test extends OrmFunctionalTestCase
 
         self::assertNotNull($notCached->version, 'Version already cached by persister above, it must be not null');
 
-        $notCached->lastUpdate = new DateTime('+1 second');
+        $notCached->lastUpdate = new DateTime();
 
         $this->em->flush();
         $this->em->clear();
@@ -52,6 +52,8 @@ class GH7067Entity
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     *
+     * @var int
      */
     public $id;
 
