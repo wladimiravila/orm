@@ -445,15 +445,17 @@ final class EntityManager implements EntityManagerInterface
         $persister = $unitOfWork->getEntityPersister($className);
 
         switch (true) {
-            case $lockMode === LockMode::OPTIMISTIC:
+            case LockMode::OPTIMISTIC === $lockMode:
                 $entity = $persister->load($sortedId);
 
                 $unitOfWork->lock($entity, $lockMode, $lockVersion);
 
                 return $entity;
-            case $lockMode === LockMode::PESSIMISTIC_READ:
-            case $lockMode === LockMode::PESSIMISTIC_WRITE:
+
+            case LockMode::PESSIMISTIC_READ === $lockMode:
+            case LockMode::PESSIMISTIC_WRITE === $lockMode:
                 return $persister->load($sortedId, null, null, [], $lockMode);
+
             default:
                 return $persister->loadById($sortedId);
         }
