@@ -12,7 +12,6 @@ use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\UnitOfWork;
-use PDO;
 use ReflectionClass;
 use function array_map;
 use function array_merge;
@@ -277,8 +276,7 @@ abstract class AbstractHydrator
                     // If there are field name collisions in the child class, then we need
                     // to only hydrate if we are looking at the correct discriminator value
                     if (isset($cacheKeyInfo['discriminatorColumn'], $data[$cacheKeyInfo['discriminatorColumn']])
-                        // Note: loose comparison required. See https://github.com/doctrine/doctrine2/pull/6304#issuecomment-323294442
-                        && ! in_array($data[$cacheKeyInfo['discriminatorColumn']], $cacheKeyInfo['discriminatorValues'])
+                        && ! in_array((string) $data[$cacheKeyInfo['discriminatorColumn']], $cacheKeyInfo['discriminatorValues'], true)
                     ) {
                         break;
                     }
@@ -436,12 +434,12 @@ abstract class AbstractHydrator
     {
         $values = array_map(
             function (string $subClass) : string {
-                return $this->getClassMetadata($subClass)->discriminatorValue;
+                return (string) $this->getClassMetadata($subClass)->discriminatorValue;
             },
             $classMetadata->getSubClasses()
         );
 
-        $values[] = $classMetadata->discriminatorValue;
+        $values[] = (string) $classMetadata->discriminatorValue;
 
         return $values;
     }
