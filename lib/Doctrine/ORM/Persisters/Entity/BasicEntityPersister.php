@@ -51,6 +51,7 @@ use function implode;
 use function in_array;
 use function is_array;
 use function is_object;
+use function reset;
 use function sprintf;
 use function strpos;
 use function strtoupper;
