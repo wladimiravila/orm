@@ -247,7 +247,7 @@ class ProxyFactoryTest extends OrmTestCase
 
     public function testFriendObjectsDoNotLazyLoadIfNotAccessingLazyState() : void
     {
-        /** @var BasicEntityPersister|\PHPUnit\Framework\MockObject\MockObject $persister */
+        /** @var BasicEntityPersister|MockObject $persister */
         $persister = $this->createMock(BasicEntityPersister::class);
         $persister->expects(self::never())->method('loadById');
 
@@ -271,7 +271,7 @@ class ProxyFactoryTest extends OrmTestCase
 
     public function testFriendObjectsLazyLoadWhenAccessingLazyState() : void
     {
-        /** @var BasicEntityPersister|\PHPUnit\Framework\MockObject\MockObject $persister */
+        /** @var BasicEntityPersister|MockObject $persister */
         $persister = $this
             ->getMockBuilder(BasicEntityPersister::class)
             ->setConstructorArgs([$this->emMock, $this->emMock->getClassMetadata(ComparableObject::class)])
@@ -322,7 +322,7 @@ class ProxyFactoryTest extends OrmTestCase
 
     public function testProxyMethodsSupportFuncGetArgsLogic() : void
     {
-        /** @var BasicEntityPersister|\PHPUnit\Framework\MockObject\MockObject $persister */
+        /** @var BasicEntityPersister|MockObject $persister */
         $persister = $this->createMock(BasicEntityPersister::class);
         $persister->expects(self::never())->method('loadById');
 

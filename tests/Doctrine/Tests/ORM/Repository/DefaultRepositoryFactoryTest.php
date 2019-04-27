@@ -23,16 +23,16 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class DefaultRepositoryFactoryTest extends DoctrineTestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|MockObject */
     private $entityManager;
 
-    /** @var Configuration|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Configuration|MockObject */
     private $configuration;
 
     /** @var DefaultRepositoryFactory */
     private $repositoryFactory;
 
-    /** @var ClassMetadataBuildingContext|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ClassMetadataBuildingContext|MockObject */
     private $metadataBuildingContext;
 
     /**
@@ -136,7 +136,7 @@ class DefaultRepositoryFactoryTest extends DoctrineTestCase
     }
 
     /**
-     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @return EntityManagerInterface|MockObject
      */
     private function createEntityManager()
     {
