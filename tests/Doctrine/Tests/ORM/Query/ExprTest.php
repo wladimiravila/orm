@@ -7,6 +7,7 @@ namespace Doctrine\Tests\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\Tests\Models\Company\CompanyEmployee;
 use Doctrine\Tests\OrmTestCase;
+use InvalidArgumentException;
 
 /**
  * Test case for the DQL Expr class used for generating DQL snippets through
@@ -334,7 +335,7 @@ class ExprTest extends OrmTestCase
 
     public function testAddThrowsException() : void
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $orExpr = $this->expr->orX();
         $orExpr->add($this->expr->quot(5, 2));
     }
