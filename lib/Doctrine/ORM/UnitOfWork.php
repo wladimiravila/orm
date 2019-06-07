@@ -2219,7 +2219,7 @@ class UnitOfWork implements PropertyChangedListener
 
                 $this->originalEntityData[$oid][$field] = $data[$field];
 
-                continue;
+                continue 2;
             }
 
             $associatedId = [];
